@@ -51,33 +51,48 @@ const steps = [
     }
 ];
 
-let step = Number(localStorage.getItem("step"));
-
-if (isNaN(step) || step < 0 || step >= steps.length) {
-    step = 0;
+if (localStorage.getItem("step") === null) {
     localStorage.setItem("step", "0");
 }
 
 const hint = document.getElementById("hint");
 const input = document.getElementById("answer");
-const error = document.getElementById("error");
 const button = document.getElementById("searchButton");
+const message = document.getElementById("message");
+
+let step = Number(localStorage.getItem("step"));
+
+if (step >= steps.length) {
+    step = 0;
+    localStorage.setItem("step", "0");
+}
 
 hint.textContent = steps[step].hint;
 
-button.addEventListener("click", function () {
-
+function searchSong() {
     const value = input.value.trim().toLowerCase();
 
-    if (value === steps[step].answer.toLowerCase()) {
+    if (value === steps[step].answer) {
+        message.style.color = "#49b675";
+        message.textContent = "Correct! Loading...";
 
-        error.textContent = "";
-        window.location.href = steps[step].page;
-
+        setTimeout(() => {
+            window.location.href = steps[step].page;
+        }, 800);
     } else {
-
-        error.textContent = "Wrong answer, try again 🤍";
-
+        message.style.color = "#ff4d6d";
+        message.textContent = "Wrong answer.";
     }
+}
 
+button.addEventListener("click", searchSong);
+
+input.addEventListener("keydown", function(e) {
+    if (e.key === "Enter") {
+        searchSong();
+    }
+});
+
+input.addEventListener("input", function() {
+    message.textContent = "";
 });
